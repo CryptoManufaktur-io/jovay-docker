@@ -1,0 +1,57 @@
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "3"
+      tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+
+services:
+  jovay:
+    image: ${JOVAY_IMAGE:-jovay-release-registry.cn-hongkong.cr.aliyuncs.com/jovay/l2-rpc:0.13.0-rc1}
+    container_name: jovay-rpc
+    stop_grace_period: 300s
+    restart: "unless-stopped"
+    privileged: true
+    environment:
+      - SEQUENCER_ADVERTISE_NODE_URL=alb-cnjrn9zqms3o5flehu.cn-hongkong.alb.aliyuncsslbintl.com:80
+      - EXTERNAL_CLB_PRE_EXPOSERPC_URL=noise_tcp://47.83.131.74:52398?842016e6eb94da561b1b4c856e08bf71cd70c05ea847e934b8be1d5a74a979f8;noise_tcp://47.83.131.74:52399?ce08efde90a7970d18dd6763fdc68d19a24084fd7c8cf67a68a19e943b30c5e3
+    ports:
+      - "${SHARE_IP}:${RPC_PORT:-18100}:18100"
+      - "${SHARE_IP}:${WS_PORT:-18200}:18200"
+      - "0.0.0.0:${P2P_PORT:-19000}:19000"
+    volumes:
+      - jovay-data:/opt/l2_deploy/light/data
+      - jovay-log:/opt/l2_deploy/light/log
+      - jovay-conf:/opt/l2_deploy/conf
+      - jovay-conf:/opt/l2_deploy/bin
+    ulimits:
+      nofile:
+        soft: 655350
+        hard: 655350
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${RPC_HOST}.service=${RPC_HOST}
+      - traefik.http.routers.${RPC_HOST}.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST}.rule=Host(`${RPC_HOST}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${RPC_HOST}lb.service=${RPC_HOST}
+      - traefik.http.routers.${RPC_HOST}lb.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST}lb.rule=Host(`${RPC_LB}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST}lb.tls.certresolver=letsencrypt
+      - traefik.http.services.${RPC_HOST}.loadbalancer.server.port=${RPC_PORT:-18100}
+      - traefik.http.routers.${WS_HOST}.service=${WS_HOST}
+      - traefik.http.routers.${WS_HOST}.entrypoints=websecure
+      - traefik.http.routers.${WS_HOST}.rule=Host(`${WS_HOST}.${DOMAIN}`)
+      - traefik.http.routers.${WS_HOST}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${WS_HOST}lb.service=${WS_HOST}
+      - traefik.http.routers.${WS_HOST}lb.entrypoints=websecure
+      - traefik.http.routers.${WS_HOST}lb.rule=Host(`${WS_LB}.${DOMAIN}`)
+      - traefik.http.routers.${WS_HOST}lb.tls.certresolver=letsencrypt
+      - traefik.http.services.${WS_HOST}.loadbalancer.server.port=${WS_PORT:-18200}
+    <<: *logging
+
+volumes:
+  jovay-data:
+  jovay-log:
+  jovay-conf:
