@@ -24,7 +24,6 @@ services:
       - jovay-data:/opt/l2_deploy/light/data
       - jovay-log:/opt/l2_deploy/light/log
       - jovay-conf:/opt/l2_deploy/conf
-      - jovay-conf:/opt/l2_deploy/bin
     ulimits:
       nofile:
         soft: 655350
