@@ -21,9 +21,10 @@ services:
       - "${SHARE_IP}:${WS_PORT:-18200}:18200"
       - "0.0.0.0:${P2P_PORT:-19000}:19000"
     volumes:
-      - jovay-data:/opt/l2_deploy/light/data
-      - jovay-log:/opt/l2_deploy/light/log
-      - jovay-conf:/opt/l2_deploy/conf
+      - ./data:/opt/l2_deploy/light/data
+      - ./log:/opt/l2_deploy/light/log
+      - ./conf:/opt/l2_deploy/conf
+      - ./conf/VERSION:/opt/l2_deploy/bin/VERSION
     ulimits:
       nofile:
         soft: 655350
