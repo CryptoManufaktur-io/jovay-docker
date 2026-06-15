@@ -1,0 +1,5 @@
+services:
+  jovay:
+    ports:
+      - "${SHARE_IP}:${RPC_PORT:-18100}:18100"
+      - "${SHARE_IP}:${WS_PORT:-18200}:18200"
