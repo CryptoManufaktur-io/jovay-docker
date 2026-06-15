@@ -9,7 +9,7 @@ x-logging: &logging
 services:
   jovay:
     image: ${JOVAY_IMAGE:-jovay-release-registry.cn-hongkong.cr.aliyuncs.com/jovay/l2-rpc:0.13.0-rc1}
-    container_name: jovay-rpc
+    container_name: jovay
     stop_grace_period: 300s
     restart: "unless-stopped"
     privileged: true
