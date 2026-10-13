@@ -5,3 +5,9 @@
 *.bak
 *.original
 custom.yml
+
+# Runtime data bind-mounted into the node container
+/data/
+/log/
+/conf/
+*.tar.gz
